@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+</head>
+
+<body>
+  <div class="dashboard">
+    <h1>GVP Detection</h1>
+  </div>
+
+  <div class="block">
+    <div class="upload-container">
+      <h2>Upload Video</h2>
+      <input type="file" id="videoUpload" accept=".mp4,.avi,.mov">
+      <button onclick="uploadVideo()">Upload</button>
+      <div id="uploadStatus"></div>
+    </div>
+  </div>
+
+  <div class="val">
+    <div class="count_hr">Waste Count: 7</div>
+    <div class="count_day">Waste Count per Day: 100</div>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="dirtyBoxesChart" class="graph"></canvas>
+
+    <canvas id="dirtyBoxesChart2" class="graph2"></canvas>
+  </div>
+
+  <script>
+
+
+
+    let dirtyBoxesChart;
+    let hourlyAverageChart;
+    let currentMaxValue = 0;
+    let totalSum = 0;
+    let totalCount = 0;
+    let lastHourLogged = null;
+    let recentValues = [];
+
+    function initCharts() {
+      // Initialize first chart (real-time data)
+      const ctx1 = document.getElementById('dirtyBoxesChart').getContext('2d');
+
+      // Reset the count displays
+      document.querySelector('.count_hr').textContent = 'Waste Count: 0';
+      document.querySelector('.count_day').textContent = 'AVG Waste Count per Day: 0';
+
+      dirtyBoxesChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Dirty Boxes Count',
+            data: [],
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Number of Dirty Boxes'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Frame'
+              }
+            }
+          }
+        }
+      });
+
+      // Initialize second chart (hourly averages line graph)
+      const ctx2 = document.getElementById('dirtyBoxesChart2').getContext('2d');
+      hourlyAverageChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Hourly Average',
+            data: [],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+            tension: 0.4  // Adds slight curve to lines
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Average Waste Count'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Hour'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateAverageDisplay() {
+      const average = totalCount > 0 ? Math.round(totalSum / totalCount) : 0;
+      document.querySelector('.count_day').textContent = `AVG Waste Count per Day: ${average}`;
+
+    }
+
+    function updateHourlyAverageChart(hour, average) {
+      const timeLabel = `${hour}:00`;
+
+      // Add new data point
+      hourlyAverageChart.data.labels.push(timeLabel);
+      hourlyAverageChart.data.datasets[0].data.push(average);
+
+      // Keep only the last 24 hours of data
+      if (hourlyAverageChart.data.labels.length > 24) {
+        hourlyAverageChart.data.labels.shift();
+        hourlyAverageChart.data.datasets[0].data.shift();
+      }
+
+      hourlyAverageChart.update();
+
+    }
+
+    function updateDirtyBoxesChart(labels, values) {
+  // Update first chart
+  dirtyBoxesChart.data.labels.push(...labels);
+  dirtyBoxesChart.data.datasets[0].data.push(...values);
+
+  // Update running totals and max value
+  values.forEach(value => {
+    recentValues.push(value);
+
+    // Maintain recentValues within 100
+    if (recentValues.length > 100) {
+      recentValues.shift();
+    }
+
+    totalSum += value;
+    totalCount++;
+
+    if (value > currentMaxValue) {
+      currentMaxValue = value;
+      document.querySelector('.count_hr').textContent = `Waste Count: ${currentMaxValue}`;
+    }
+  });
+
+  const recentSum = recentValues.reduce((sum, val) => sum + val, 0);
+  const recentAverage = recentValues.length ? (recentSum / recentValues.length).toFixed(2) : 0;
+
+  // Extract hour from the last label
+  const lastHour = extractHourFromLabel(labels[labels.length - 1]);
+
+  updateAverageDisplay();
+
+  // Limit data points for first chart
+  const maxDataPoints = 500;
+  if (dirtyBoxesChart.data.labels.length > maxDataPoints) {
+    const removedValue = dirtyBoxesChart.data.datasets[0].data.shift();
+    dirtyBoxesChart.data.labels.shift();
+
+    totalSum -= removedValue;
+    totalCount--;
+    updateAverageDisplay();
+  }
+
+  dirtyBoxesChart.update();
+
+  // Update hourly chart only when recentValues hits a threshold
+  if (recentValues.length >= 10) {
+
+    updateHourlyAverageChart(lastHour, recentAverage);
+  }
+}
+
+
+    function extractHourFromLabel(label) {
+      const dateTimeParts = label.split('_');
+
+      const timeParts = dateTimeParts[1].split('-');
+
+      return timeParts[0];
+    }
+
+    function uploadVideo() {
+      const fileInput = document.getElementById('videoUpload');
+      const uploadStatus = document.getElementById('uploadStatus');
+      const file = fileInput.files[0];
+      if (!file) {
+        uploadStatus.textContent = 'Please select a video file';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('video', file);
+
+      // Reset first chart and tracking variables
+      dirtyBoxesChart.data.labels = [];
+      dirtyBoxesChart.data.datasets[0].data = [];
+      currentMaxValue = 0;
+      totalSum = 0;
+      totalCount = 0;
+
+      document.querySelector('.count_hr').textContent = 'Waste Count: 0';
+      document.querySelector('.count_day').textContent = 'Waste Count per Day: 0';
+
+      dirtyBoxesChart.update();
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          uploadStatus.textContent = data.message;
+          startDataPolling();
+        })
+        .catch(error => {
+          uploadStatus.textContent = 'Upload failed: ' + error;
+        });
+    }
+
+    function startDataPolling() {
+      const pollingInterval = setInterval(() => {
+        fetch('/dirty_boxes')
+          .then(response => response.json())
+          .then(data => {
+            if (data.labels.length > 0) {
+              updateDirtyBoxesChart(data.labels, data.values);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching dirty boxes:', error);
+            clearInterval(pollingInterval);
+          });
+      }, 2000); // Poll every 2 seconds
+    }
+
+    // Add function to reset charts at midnight
+    function setupMidnightReset() {
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const timeUntilMidnight = tomorrow - now;
+
+      setTimeout(() => {
+        // Reset hourly average chart
+        hourlyAverageChart.data.labels = [];
+        hourlyAverageChart.data.datasets[0].data = [];
+        hourlyAverageChart.update();
+        lastHourLogged = null;
+
+        setupMidnightReset(); // Setup next day's reset
+      }, timeUntilMidnight);
+    }
+
+    // Initialize everything
+    initCharts();
+    setupMidnightReset();
+  </script>
+
+</body>
+
+</html>

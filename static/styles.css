@@ -1,0 +1,275 @@
+/* body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #98B9F2;
+}
+
+.dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #372248;
+    height: 3rem;
+    color: #fff;
+
+}
+
+.top{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #918EF4;
+    height: 2.5rem;
+    font-size: x-large;
+
+    
+}
+.block{
+    margin-top: 3rem;
+    height: 40rem;
+    width: 75rem;
+    border: 2px solid black;
+    margin-left: 15%;
+    border-radius: 10px;
+    background-color: #fff;
+
+}
+.val{
+    margin-top: 4rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 3rem;
+
+
+}
+.time{
+    width: 15%;
+    height: 100%;
+    border: 2px solid black;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #918EF4;
+    
+}
+.count_hr,.count_day{
+    width: 15%;
+    height: 100%;
+    border: 2px solid black;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #918EF4;
+}
+ */
+
+ /* General body styling */
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #6F86D6, #48C6EF);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Dashboard styling */
+.dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #372248;
+    height: 3rem;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+/* Top bar styling */
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background: linear-gradient(135deg, #918EF4, #6F86D6);
+    height: 3rem;
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: bold;
+    width: 100%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Block styling */
+.block {
+    margin-top: 3rem;
+    height: 15rem; /* Increased height for more spacing */
+    width: 40rem;
+    border: none;
+    border-radius: 20px;
+    background: #f9f9f9; /* Softer background color */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem; /* Added padding for internal spacing */
+}
+
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem; /* Increased space between elements */
+    width: 100%;
+}
+
+.upload-container h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.upload-container input[type="file"] {
+    padding: 0.5rem;
+    border: 2px solid #ddd; /* Softer border color */
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    width: 80%; /* Consistent width */
+    transition: border-color 0.3s ease;
+}
+
+.upload-container input[type="file"]:hover {
+    border-color: #007bff; /* Change border color on hover */
+}
+
+.upload-container button {
+    padding: 0.5rem 2rem; /* Adjusted padding for balance */
+    background-color: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.upload-container button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05); /* Subtle hover effect */
+}
+
+#uploadStatus {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #555; /* Softer text color */
+    text-align: center;
+}
+
+
+/* Value container styling */
+.val {
+    margin-top: 4rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 4rem;
+    width: 100%;
+}
+
+/* Common styles for time, count_hr, and count_day */
+.time, .count_hr, .count_day {
+    width: 20%;
+    height: 100%;
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #918EF4, #6F86D6);
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid black;
+}
+
+.graph,.graph2{
+    margin-top: 2rem;
+    width: 50rem;
+    height: 50rem;
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background: linear-gradient(135deg, #ebedf4, #ebedf4);
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid black;
+    margin-bottom: 2rem;
+}
+
+.graph2{
+    float: auto;
+}
+
+
+.time:hover, .count_hr:hover, .count_day:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Add responsiveness */
+@media (max-width: 768px) {
+    .block {
+        width: 90%;
+        height: auto;
+    }
+
+    .time, .count_hr, .count_day {
+        width: 30%;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard, .top {
+        flex-direction: column;
+        height: auto;
+        font-size: 1rem;
+        padding: 0.5rem 0;
+    }
+
+    .time, .count_hr, .count_day {
+        width: 80%;
+        margin: 0.5rem 0;
+    }
+
+    .val {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
